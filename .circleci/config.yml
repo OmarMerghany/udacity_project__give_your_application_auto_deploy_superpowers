@@ -16,24 +16,18 @@ commands:
             aws s3 rm s3://udapeople-prod-<<parameters.workflow_id>> --recursive
             aws cloudformation delete-stack --stack-name udapeople-frontend-prod-<<parameters.workflow_id>>
 
-  # revert-migrations:
-  #   description: Revert the last migration if successfully run in the current workflow.
-  #   parameters:
-  #     # Add parameter here     
-  #   steps:
-  #     - run:
-  #         name: Revert migrations
-  #         # Add when this will run
-  #         command: |
-  #           # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-  #           SUCCESS = 1
-  #           if(( $SUCCESS==1 )); 
-  #           then
-  #           #  cd ~/project/backend
-  #           #  npm install
-  #           #  Add revert code here. You can find this in the Getting Started section.
-  #             exit 1
-  #           fi
+  revert-migrations:
+    description: Revert the last migration if successfully run in the current workflow.
+    steps:
+      - run:
+          name: Revert migrations
+          when: on_fail
+          command: |
+            cd ~/project/backend
+            if [[ -f "~/project/.circleci/outputs/db_migration_success" ]]; then
+              npm i
+              npm run migration:revert
+            fi
             
 jobs:
   build-frontend:
@@ -178,7 +172,8 @@ jobs:
           name: Configure server
           command: |
             ansible-playbook -i inventory.txt .circleci/ansible/configure-server.yml
-      # Here's where you will add some code to rollback on failure      
+      - destroy_environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID}"      
 
   run-migrations:
     docker:
@@ -207,34 +202,51 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/outputs/
-      # - destroy_environment:
-      #     workflow_id: "${CIRCLE_WORKFLOW_ID}"
+      - destroy_environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID}"
      # Here's where you will add some code to rollback on failure      
 
-#   deploy-frontend:
-#     docker:
-#       # Docker image here that supports AWS CLI
-#     steps:
-#       # Checkout code from git
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Get backend url
-#           command: |
-#             # your code here
-#             export API_URL="http://${BACKEND_IP}:3030"
-#             echo "${API_URL}"
-#       - run:
-#           name: Deploy frontend objects
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure      
+  deploy-frontend:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update curl nodejs npm
+            apk add --update curl tar
+            pip install awscli
+      - run:
+          name: Get backend url
+          command: |
+            export API_URL=`cat .circleci/outputs/backend_url.txt`
+            echo "API_URL: $API_URL"
+      - run:
+          name: Deploy frontend objects
+          command: |
+            cd ~/project/frontend
+            npm i
+            npm install typescript@rc
+            npm run build
+      - run:
+          name: Copy frontend to s3 bucket.
+          command: |
+            cd ~/project/frontend
+            aws s3 cp dist s3://udapeople-prod-${CIRCLE_WORKFLOW_ID} --recursive
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/frontend/dist
+      - destroy_environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID}"
+      - revert-migrations     
                     
 #   deploy-backend:
 #     docker:
-#       # Docker image here that supports Ansible
+#       - image: python:3.7-alpine3.11
 #     steps:
 #       # Checkout code from git
 #       # Add ssh keys with fingerprint
