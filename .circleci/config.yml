@@ -141,13 +141,6 @@ jobs:
               --stack-name udapeople-frontend-prod-${CIRCLE_WORKFLOW_ID} \
               --parameter-overrides ID="prod-${CIRCLE_WORKFLOW_ID}"  
       - run:
-          name: Ensure cloudfront infrastructure exist
-          command: |
-            aws cloudformation deploy \
-              --template-file .circleci/files/cloudfront.yml \
-              --stack-name udapeople-cloudfront-prod-${CIRCLE_WORKFLOW_ID} \
-              --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID}"  
-      - run:
           name: Add back-end ip to ansible inventory
           command: |
             BACKEND_AWS_PUBLIC_IP=$(aws ec2 describe-instances \
@@ -162,9 +155,10 @@ jobs:
       - persist_to_workspace:
           root: ~/
           paths:
-            - project/.circleci/outputs/backend_url.txt
-            - project/.circleci/ansible/inventory.txt
-      # Here's where you will add some code to rollback on failure      
+            - .circleci/outputs/backend_url.txt
+            - .circleci/ansible/inventory.txt
+      - destroy_environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"      
 
   # configure-infrastructure:
 #     docker:
