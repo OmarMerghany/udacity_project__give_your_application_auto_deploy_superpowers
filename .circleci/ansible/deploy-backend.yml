@@ -9,6 +9,8 @@
     - ansible_host_key_checking: false
     - ansible_stdout_callback: yaml
     - TYPEORM_ENTITIES: ./src/modules/domain/**/*.entity.ts
+    - NODE_ENV: production
+    - ENVIRONMENT: production
   roles:
     - role: weareinteractive.environment
       become: true
