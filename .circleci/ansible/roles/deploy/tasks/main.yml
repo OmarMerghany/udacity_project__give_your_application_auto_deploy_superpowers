@@ -18,6 +18,8 @@
   shell: |
     cd ~/src
     npm install
+  args:
+    executable: /bin/bash
 - name: "Executing node"
   shell: |
     export
