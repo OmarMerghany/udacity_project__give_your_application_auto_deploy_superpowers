@@ -1,0 +1,34 @@
+---
+- name: "Creates backend app directory"
+  file:
+    path: ~/src
+    state: directory
+
+- name: "Copy compiled backend app"
+  copy:
+    src: dist.zip
+    dest: "~/src/dist.zip"
+
+- name: "Unzip backend files to correct directory"
+  shell: |
+    cd ~/src
+    unzip dist.zip
+    rm -rf dist.zip
+- name: "Install dependencies for project"
+  shell: |
+    cd ~/src
+    npm install
+- name: "Executing node"
+  shell: |
+    export
+    cd ~/src
+    pm2 start main.js
+  register: execute_node
+
+- name: print message
+  debug:
+    msg: "{{ execute_node.stdout_lines }}"
+
+- name: "Configure pm2 to start as service"
+  shell: |
+    env PATH=$PATH:/usr/local/bin pm2 startup -u ubuntu
