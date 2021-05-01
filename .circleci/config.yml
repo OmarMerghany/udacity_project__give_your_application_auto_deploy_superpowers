@@ -144,14 +144,16 @@ jobs:
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
               --output text)
             echo "http://$BACKEND_AWS_PUBLIC_IP:3030" >> .circleci/outputs/backend_url.txt
+            echo "http://$BACKEND_AWS_PUBLIC_IP:3030" >> ~/output.txt
             echo "$BACKEND_AWS_PUBLIC_IP" >> .circleci/ansible/inventory.txt
             cat .circleci/outputs/backend_url.txt
       - run: yum -y install tar gzip
       - persist_to_workspace:
           root: ~/
           paths:
-            - project/.circleci/outputs/backend_url.txt
+            - .circleci/outputs/backend_url.txt
             - project/.circleci/ansible/inventory.txt
+            - ~/output.txt
       - destroy_environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID}"      
 
@@ -313,7 +315,10 @@ jobs:
             cat ~/project/.circleci/ansible/inventory.txt
             ls .circleci/ansible/
             cat .circleci/ansible/inventory.txt
+            cat ~/output.txt
             export API_URL=`cat .circleci/outputs/backend_url.txt`
+            echo "API_URL: $API_URL"
+            export API_URL=`cat ~/output.txt`
             echo "API_URL: $API_URL"
       - run:
           name: Backend smoke test.
