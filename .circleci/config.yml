@@ -1,7 +1,7 @@
 version: 2.1
 
 commands:
-  destroy_environment:
+  destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
       workflow_id:
@@ -40,9 +40,10 @@ jobs:
       - run:
           name: Build front-end
           command: |
-            cd frontend
-            npm i
-            npm run build
+            sudo npm install webpack-dev-server -g
+            sudo cd frontend
+            sudo npm i
+            sudo npm run build
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
@@ -75,7 +76,6 @@ jobs:
           name: frontend test
           command: |
               cd frontend
-              npm i
               npm run test
                 
   test-backend:
@@ -128,14 +128,16 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
               --stack-name udapeople-backend-prod-${CIRCLE_WORKFLOW_ID} \
-              --parameter-overrides ID="prod-${CIRCLE_WORKFLOW_ID}"  
+              --parameter-overrides ID="prod-${CIRCLE_WORKFLOW_ID}" \ 
+              --tags project=udapeople
       - run:
           name: Ensure front-end infrastructure exist
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/frontend.yml \
               --stack-name udapeople-frontend-prod-${CIRCLE_WORKFLOW_ID} \
-              --parameter-overrides ID="prod-${CIRCLE_WORKFLOW_ID}"  
+              --parameter-overrides ID="prod-${CIRCLE_WORKFLOW_ID}" \
+              --tags project=udapeople  
       - run:
           name: Add back-end ip to ansible inventory
           command: |
@@ -143,7 +145,6 @@ jobs:
               --filters "Name=tag:Name,Values=backend-prod-${CIRCLE_WORKFLOW_ID}" \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
               --output text)
-            echo "http://$BACKEND_AWS_PUBLIC_IP:3030" >> .circleci/outputs/backend_url.txt
             echo "http://$BACKEND_AWS_PUBLIC_IP:3030" > ~/output.txt
             echo "$BACKEND_AWS_PUBLIC_IP" >> .circleci/ansible/inventory.txt
             cat .circleci/outputs/backend_url.txt
@@ -152,10 +153,9 @@ jobs:
       - persist_to_workspace:
           root: ~/
           paths:
-            - .circleci/outputs/backend_url.txt
             - project/.circleci/ansible/inventory.txt
             - output.txt
-      - destroy_environment:
+      - destroy-environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID}"      
 
   configure-infrastructure:
@@ -177,7 +177,12 @@ jobs:
             pwd
             cat .circleci/ansible/inventory.txt
             ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
-      - destroy_environment:
+      - run:
+          name: Install AWS CLI for rollback
+          when: on_fail
+          command: |
+            apk add --update py3-pip && pip3 install --upgrade pip && pip3 install awscli
+      - destroy-environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID}"      
 
   run-migrations:
@@ -191,10 +196,12 @@ jobs:
           name: Run migrations
           command: |
             cd backend
-            npm install
-            npm run build
-            npm run migrations >> migration_output.txt
+            sudo npm install
+            sudo npm run build
+            sudo npm run migrations >> migration_output.txt
             cat migration_output.txt
+            migration_status=$(cat migration_output.txt | grep -c "has been executed successfully")
+            if [ $migration_status > 0 ]; then exit 0; else exit 1; fi;
       - run:
           name: Store migration result in a file.
           command: |
@@ -207,7 +214,7 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/outputs/
-      - destroy_environment:
+      - destroy-environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID}"
 
   deploy-frontend:
@@ -220,14 +227,19 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update curl nodejs npm
-            apk add --update curl tar
-            pip install awscli
+            sudo apk add --update curl nodejs npm
+            sudo apk add --update curl tar
+            sudo npm install webpack-dev-server -g
+            sudo npm install
+            sudo pip install awscli
       - run:
           name: Get backend url
           command: |
             export API_URL=`cat ~/output.txt`
             echo "API_URL: $API_URL"
+            echo ENVIRONMENT=production > "frontend/.env"
+            echo NODE_ENV=production >> "frontend/.env"
+            echo API_URL=$API_URL >> "frontend/.env"
       - run:
           name: Deploy frontend objects
           command: |
@@ -244,7 +256,7 @@ jobs:
           root: ~/
           paths:
             - project/frontend/dist
-      - destroy_environment:
+      - destroy-environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID}"
       - revert-migrations     
                     
@@ -253,6 +265,8 @@ jobs:
       - image: python:3.7-alpine3.11
     steps:
       - checkout
+      - restore_cache:
+          keys: [backend-build]
       - add_ssh_keys:
           fingerprints: ["29:46:04:9c:65:1e:1c:d1:0e:8a:65:0a:c1:7c:f1:11"]
       - attach_workspace:
@@ -263,6 +277,12 @@ jobs:
             apk add --update curl nodejs npm
             apk add --update ansible zip
             pip install awscli
+            apk add --update openssh-client tar gzip
+      - run:
+          name: Deploy backend
+          command: |
+            cd /home
+            tar czf backend.tar.gz -P /home/circleci/project/backend/dist
       - run:
           name: Build backend app
           command: |
@@ -282,7 +302,7 @@ jobs:
             ansible-galaxy install weareinteractive.environment
             cat ~/project/.circleci/ansible/inventory.txt
             ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/deploy-backend.yml
-      - destroy_environment:
+      - destroy-environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID}"
       - revert-migrations 
 
@@ -303,11 +323,6 @@ jobs:
           name: Get backend url
           command: |
             pwd
-            ls ~/project/.circleci/outputs/
-            cat ~/project/.circleci/outputs/backend_url.txt
-            ls ~/project/.circleci/ansible/
-            cat ~/project/.circleci/ansible/inventory.txt
-            ls .circleci/ansible/
             cat .circleci/ansible/inventory.txt
             cat ~/output.txt
             export API_URL=`cat ~/output.txt`
@@ -315,7 +330,14 @@ jobs:
       - run:
           name: Backend smoke test.
           command: |
-            curl -s $API_URL/api/status
+            # curl -s $API_URL/api/status
+            cat $API_URL/api/status
+            if curl -s $API_URL/api/status
+            then
+            return 1
+            else
+            return 0
+            fi
       - run:
           name: Frontend smoke test.
           command: |
@@ -325,7 +347,7 @@ jobs:
             else
             return 1
             fi
-      # - destroy_environment:
+      # - destroy-environment:
       #     workflow_id: "${CIRCLE_WORKFLOW_ID}"
       # - revert-migrations  
 
