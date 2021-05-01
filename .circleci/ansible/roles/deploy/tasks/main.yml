@@ -1,15 +1,18 @@
 ---
 - name: "Creates backend app directory"
+  become: yes
   file:
     path: ~/src
     state: directory
 
 - name: "Copy compiled backend app"
+  become: yes
   copy:
     src: dist.zip
     dest: "~/src/dist.zip"
 
 - name: "Unzip backend files to correct directory"
+  become: yes
   shell: |
     cd ~/src
     unzip dist.zip
@@ -30,6 +33,7 @@
   register: execute_node
 
 - name: print message
+  become: yes
   debug:
     msg: "{{ execute_node.stdout_lines }}"
 
