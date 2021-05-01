@@ -8,21 +8,7 @@
     - ansible_python_interpreter: /usr/bin/python3
     - ansible_host_key_checking: false
     - ansible_stdout_callback: yaml
-    - TYPEORM_ENTITIES: ./src/modules/domain/**/*.entity.ts
-    - NODE_ENV: production
-    - ENVIRONMENT: production
-    - TYPEORM_CONNECTION: postgres
-    - TYPEORM_ENTITIES: ./src/modules/domain/**/*.entity.ts
-    - TYPEORM_MIGRATIONS: ./src/migrations/*.ts
-    - TYPEORM_HOST: "{{ lookup('env','TYPEORM_HOST') }}"
-    - TYPEORM_PORT: "{{ lookup('env','TYPEORM_PORT') }}"
-    - TYPEORM_USERNAME: "{{ lookup('env','TYPEORM_USERNAME') }}"
-    - TYPEORM_PASSWORD: "{{ lookup('env','TYPEORM_PASSWORD') }}"
-    - TYPEORM_DATABASE: "{{ lookup('env','TYPEORM_DATABASE') }}"
   roles:
-    - role: weareinteractive.environment
-      become: true
-    # - role: configure-server
-    #   become: true
-    - role: deploy
-      become: true
+    - configure-prometheus-node-exporter
+    - configure-server
+    - deploy-backend
