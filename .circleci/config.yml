@@ -171,8 +171,9 @@ jobs:
       - run: 
           name: Configure server
           command: |
-            cat inventory.txt
-            ansible-playbook -i inventory.txt .circleci/ansible/configure-server.yml
+            pwd
+            cat .circleci/ansible/inventory.txt
+            ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
       - destroy_environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID}"      
 
@@ -222,6 +223,7 @@ jobs:
       - run:
           name: Get backend url
           command: |
+            pwd
             ls ~/project/.circleci/outputs/
             cat ~/project/.circleci/outputs/backend_url.txt
             ls .circleci/outputs/
@@ -304,6 +306,7 @@ jobs:
       - run:
           name: Get backend url
           command: |
+            pwd
             ls ~/project/.circleci/outputs/
             cat ~/project/.circleci/outputs/backend_url.txt
             ls ~/project/.circleci/ansible/
