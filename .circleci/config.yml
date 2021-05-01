@@ -221,6 +221,8 @@ jobs:
       - run:
           name: Get backend url
           command: |
+            ls ~/project/.circleci/outputs/
+            cat ~/project/.circleci/outputs/backend_url.txt
             export API_URL=`cat ~/project/.circleci/outputs/backend_url.txt`
             echo "API_URL: $API_URL"
       - run:
@@ -296,6 +298,8 @@ jobs:
       - run:
           name: Get backend url
           command: |
+            ls ~/project/.circleci/outputs/
+            cat ~/project/.circleci/outputs/backend_url.txt
             export API_URL=`cat ~/project/.circleci/outputs/backend_url.txt`
             echo "API_URL: $API_URL"
       - run:
