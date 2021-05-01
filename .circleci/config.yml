@@ -224,11 +224,11 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            sudo apk add --update curl nodejs npm
-            sudo apk add --update curl tar
-            sudo npm install webpack-dev-server -g
-            sudo npm install
-            sudo pip install awscli
+            apk add --update curl nodejs npm
+            apk add --update curl tar
+            npm install webpack-dev-server -g
+            npm install
+            pip install awscli
       - run:
           name: Get backend url
           command: |
@@ -274,12 +274,7 @@ jobs:
             apk add --update curl nodejs npm
             apk add --update ansible zip
             pip install awscli
-            apk add --update openssh-client tar gzip
-      - run:
-          name: Deploy backend
-          command: |
-            cd /home
-            tar czf backend.tar.gz -P /home/circleci/project/backend/dist
+
       - run:
           name: Build backend app
           command: |
