@@ -5,10 +5,12 @@
     update_cache: yes
 
 - name: "upgrade packages"
+  become: yes
   apt:
     upgrade: yes
 
 - name: remove dependencies that are no longer required
+  become: yes
   apt:
     autoremove: yes
 
@@ -16,6 +18,7 @@
   shell: |
     curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash - && sudo apt-get install -y nodejs
 - name: "Install zip utility."
+  become: yes
   apt:
     name: [ "zip", "unzip" ]
     state: latest
