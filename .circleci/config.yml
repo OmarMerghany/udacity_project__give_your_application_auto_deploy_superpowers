@@ -294,10 +294,13 @@ jobs:
             apk add --update curl
             pip install awscli
       - run:
-          name: Get backend url and smoke test.
+          name: Get backend url
           command: |
-            API_URL=`cat .circleci/outputs/backend_url.txt`
-            echo $API_URL
+            export API_URL=`cat .circleci/outputs/backend_url.txt`
+            echo "API_URL: $API_URL"
+      - run:
+          name: Backend smoke test.
+          command: |
             curl -s $API_URL/api/status
       - run:
           name: Frontend smoke test.
