@@ -221,9 +221,7 @@ jobs:
       - run:
           name: Get backend url
           command: |
-            ls ~/project/.circleci/outputs/
-            cat .circleci/outputs/backend_url.txt
-            export API_URL=`cat .circleci/outputs/backend_url.txt`
+            export API_URL=`cat ~/project/.circleci/outputs/backend_url.txt`
             echo "API_URL: $API_URL"
       - run:
           name: Deploy frontend objects
@@ -298,10 +296,7 @@ jobs:
       - run:
           name: Get backend url
           command: |
-            ls outputs/
-            cat outputs/backend_url.txt
-            cat .circleci/outputs/backend_url.txt
-            export API_URL=`cat .circleci/outputs/backend_url.txt`
+            export API_URL=`cat ~/project/.circleci/outputs/backend_url.txt`
             echo "API_URL: $API_URL"
       - run:
           name: Backend smoke test.
