@@ -226,14 +226,7 @@ jobs:
       - run:
           name: Get backend url
           command: |
-            pwd
-            ls .circleci/outputs/
-            cat .circleci/outputs/backend_url.txt
-            ls .circleci/ansible/
-            cat .circleci/ansible/inventory.txt
-            ls ~/project/.circleci/outputs/
-            cat ~/project/.circleci/outputs/backend_url.txt
-            export API_URL=`cat .circleci/outputs/backend_url.txt`
+            export API_URL=`cat ~/output.txt`
             echo "API_URL: $API_URL"
       - run:
           name: Deploy frontend objects
@@ -317,8 +310,6 @@ jobs:
             ls .circleci/ansible/
             cat .circleci/ansible/inventory.txt
             cat ~/output.txt
-            export API_URL=`cat .circleci/outputs/backend_url.txt`
-            echo "API_URL: $API_URL"
             export API_URL=`cat ~/output.txt`
             echo "API_URL: $API_URL"
       - run:
@@ -334,9 +325,9 @@ jobs:
             else
             return 1
             fi
-      - destroy_environment:
-          workflow_id: "${CIRCLE_WORKFLOW_ID}"
-      - revert-migrations  
+      # - destroy_environment:
+      #     workflow_id: "${CIRCLE_WORKFLOW_ID}"
+      # - revert-migrations  
 
   # cloudfront-update:
   #   docker:
