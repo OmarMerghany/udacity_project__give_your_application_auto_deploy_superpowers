@@ -146,6 +146,7 @@ jobs:
             echo "http://$BACKEND_AWS_PUBLIC_IP:3030" >> .circleci/outputs/backend_url.txt
             echo "$BACKEND_AWS_PUBLIC_IP" >> .circleci/ansible/inventory.txt
             cat .circleci/outputs/backend_url.txt
+            cat project/.circleci/outputs/backend_url.txt
       - run: yum -y install tar gzip
       - persist_to_workspace:
           root: ~/
@@ -300,6 +301,10 @@ jobs:
           command: |
             ls ~/project/.circleci/outputs/
             cat ~/project/.circleci/outputs/backend_url.txt
+            ls ~/project/.circleci/ansible/
+            cat ~/project/.circleci/ansible/inventory.txt
+            ls .circleci/ansible/
+            cat .circleci/ansible/inventory.txt
             export API_URL=`cat ~/project/.circleci/outputs/backend_url.txt`
             echo "API_URL: $API_URL"
       - run:
@@ -319,20 +324,39 @@ jobs:
           workflow_id: "${CIRCLE_WORKFLOW_ID}"
       - revert-migrations  
 
-#   cloudfront-update:
-#     docker:
-#       # Docker image here that supports AWS CLI
-#     steps:
-#       # Checkout code from git
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Update cloudfront distribution
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure  
+  # cloudfront-update:
+  #   docker:
+  #     - image: amazon/aws-cli
+  #   steps:
+  #     - checkout
+  #     - attach_workspace:
+  #         at: ~/
+  #     - run:
+  #         name: Install dependencies
+  #         command: |
+  #           # your code here
+  #     - run:
+  #         name: Update cloudfront distribution
+  #         command: |
+  #           OLD_WORKFLOW_ID=$(aws cloudformation \
+  #             list-exports --query "Exports[?Name==\`UdapeopleWorkflowID\`].Value" \
+  #             --no-paginate --output text)
+  #           echo "OLD_WORKFLOW_ID: $OLD_WORKFLOW_ID."
+  #           export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
+  #             --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
+  #           printf '%s\n' "${STACKS[@]}"
+  #           aws cloudformation deploy \
+  #             --template-file .circleci/files/cloudfront.yml \
+  #             --parameter-overrides workflow_id="prod-${CIRCLE_WORKFLOW_ID}" \
+  #             --stack-name udapeople-prod-cloudfront
+  #           if printf '%s\n' "${STACKS[@]}" | grep -q "$OLD_WORKFLOW_ID"; then
+  #             echo "Removing previous stack"
+  #             aws s3 rm "s3://udapeople-${OLD_WORKFLOW_ID}" --recursive
+  #             aws cloudformation delete-stack --stack-name "udapeople-backend-${OLD_WORKFLOW_ID}"
+  #             aws cloudformation delete-stack --stack-name "udapeople-frontend-${OLD_WORKFLOW_ID}"
+  #           fi
+
+      # Here's where you will add some code to rollback on failure  
 
 # cleanup:
 #     docker:
