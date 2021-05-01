@@ -224,13 +224,13 @@ jobs:
           name: Get backend url
           command: |
             pwd
-            ls ~/project/.circleci/outputs/
-            cat ~/project/.circleci/outputs/backend_url.txt
             ls .circleci/outputs/
             cat .circleci/outputs/backend_url.txt
             ls .circleci/ansible/
             cat .circleci/ansible/inventory.txt
-            export API_URL=`cat ~/project/.circleci/outputs/backend_url.txt`
+            ls ~/project/.circleci/outputs/
+            cat ~/project/.circleci/outputs/backend_url.txt
+            export API_URL=`cat .circleci/outputs/backend_url.txt`
             echo "API_URL: $API_URL"
       - run:
           name: Deploy frontend objects
@@ -313,7 +313,7 @@ jobs:
             cat ~/project/.circleci/ansible/inventory.txt
             ls .circleci/ansible/
             cat .circleci/ansible/inventory.txt
-            export API_URL=`cat ~/project/.circleci/outputs/backend_url.txt`
+            export API_URL=`cat .circleci/outputs/backend_url.txt`
             echo "API_URL: $API_URL"
       - run:
           name: Backend smoke test.
