@@ -146,7 +146,6 @@ jobs:
             echo "http://$BACKEND_AWS_PUBLIC_IP:3030" >> .circleci/outputs/backend_url.txt
             echo "$BACKEND_AWS_PUBLIC_IP" >> .circleci/ansible/inventory.txt
             cat .circleci/outputs/backend_url.txt
-            cat project/.circleci/outputs/backend_url.txt
       - run: yum -y install tar gzip
       - persist_to_workspace:
           root: ~/
@@ -172,6 +171,7 @@ jobs:
       - run: 
           name: Configure server
           command: |
+            cat inventory.txt
             ansible-playbook -i inventory.txt .circleci/ansible/configure-server.yml
       - destroy_environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID}"      
@@ -224,6 +224,10 @@ jobs:
           command: |
             ls ~/project/.circleci/outputs/
             cat ~/project/.circleci/outputs/backend_url.txt
+            ls .circleci/outputs/
+            cat .circleci/outputs/backend_url.txt
+            ls .circleci/ansible/
+            cat .circleci/ansible/inventory.txt
             export API_URL=`cat ~/project/.circleci/outputs/backend_url.txt`
             echo "API_URL: $API_URL"
       - run:
@@ -278,6 +282,7 @@ jobs:
             ls ~/project/.circleci/ansible/roles/deploy/files/
             cd ~/project/backend
             ansible-galaxy install weareinteractive.environment
+            cat ~/project/.circleci/ansible/inventory.txt
             ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/deploy-backend.yml
       - destroy_environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID}"
