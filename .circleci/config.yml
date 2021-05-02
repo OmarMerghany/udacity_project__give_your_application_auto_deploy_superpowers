@@ -166,6 +166,8 @@ jobs:
           fingerprints: ["29:46:04:9c:65:1e:1c:d1:0e:8a:65:0a:c1:7c:f1:11"]
       - attach_workspace:
           at: ~/
+      - restore_cache:
+          keys: [backend-build]
       - run: 
           name: Install dependencies
           command: |
@@ -175,6 +177,20 @@ jobs:
           command: |
             pwd
             cat .circleci/ansible/inventory.txt
+
+            echo ENVIRONMENT=production > "backend/dist/.env"
+
+            echo TYPEORM_CONNECTION=postgres >> "backend/dist/.env"
+            echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/dist/.env"
+            echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> "backend/dist/.env"
+            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/dist/.env"
+            echo NODE_ENV=production >> "backend/dist/.env"
+
+            echo TYPEORM_HOST=$TYPEORM_HOST >> "backend/dist/.env"
+            echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/dist/.env"
+            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/dist/.env"
+            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/dist/.env"
+            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/dist/.env"
             ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
       - run:
           name: Install AWS CLI for rollback
