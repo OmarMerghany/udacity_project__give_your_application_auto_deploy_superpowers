@@ -278,6 +278,7 @@ jobs:
       - run:
           name: Build backend app
           command: |
+            pwd
             cd ~/project/backend
             npm i
             npm run build

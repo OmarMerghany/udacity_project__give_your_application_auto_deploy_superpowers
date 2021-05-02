@@ -1,39 +1,36 @@
 ---
 - name: "Creates backend app directory"
-  become: yes
   file:
-    path: ~/src
+    path: /home/ubuntu/src
     state: directory
 
 - name: "Copy compiled backend app"
-  become: yes
   copy:
     src: dist.zip
-    dest: "~/src/dist.zip"
+    dest: "/home/ubuntu/src/dist.zip"
 
 - name: "Unzip backend files to correct directory"
-  become: yes
   shell: |
-    cd ~/src
+    cd /home/ubuntu/src
     unzip dist.zip
     rm -rf dist.zip
     
 - name: "Install dependencies for project"
   become: yes
   shell: |
-    cd ~/src
+    cd /home/ubuntu/src
     npm install
 
 - name: "Executing node"
   become: yes
   shell: |
     export
-    cd ~/src
+    cd /home/ubuntu/src
     pm2 start main.js
   register: execute_node
 
 - name: print message
-  become: yes
+  # become: yes
   debug:
     msg: "{{ execute_node.stdout_lines }}"
 
