@@ -285,7 +285,7 @@ jobs:
             ls
             cd dist
             ls
-            cp ../package.json . ../main.ts
+            cp ../package.json . 
             zip -rq dist.zip *
             mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
             mv dist.zip ~/project/.circleci/ansible/roles/deploy/files/
@@ -345,6 +345,7 @@ jobs:
       # - destroy-environment:
       #     workflow_id: "${CIRCLE_WORKFLOW_ID}"
       # - revert-migrations  
+
 
   # cloudfront-update:
   #   docker:
