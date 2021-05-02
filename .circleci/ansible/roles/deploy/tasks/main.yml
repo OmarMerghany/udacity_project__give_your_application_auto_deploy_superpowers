@@ -16,13 +16,13 @@
     rm -rf dist.zip
     
 - name: "Install dependencies for project"
-  become: yes
+  # become: yes
   shell: |
     cd /home/ubuntu/src
     npm install
 
 - name: "Executing node"
-  become: yes
+  # become: yes
   shell: |
     export
     cd /home/ubuntu/src
@@ -35,6 +35,6 @@
     msg: "{{ execute_node.stdout_lines }}"
 
 - name: "Configure pm2 to start as service"
-  become: yes
+  # become: yes
   shell: |
     env PATH=$PATH:/usr/local/bin pm2 startup -u ubuntu

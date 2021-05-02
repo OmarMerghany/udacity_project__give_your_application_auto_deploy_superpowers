@@ -278,8 +278,20 @@ jobs:
       - run:
           name: Build backend app
           command: |
-            pwd
             cd ~/project/backend
+            pwd
+            echo ENVIRONMENT=production > "dist/.env"
+            echo TYPEORM_CONNECTION=postgres >> "dist/.env"
+            echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "dist/.env"
+            echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> "dist/.env"
+            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "dist/.env"
+            echo NODE_ENV=production >> "dist/.env"
+            echo TYPEORM_HOST=$TYPEORM_HOST >> "dist/.env"
+            echo TYPEORM_PORT=$TYPEORM_PORT >> "dist/.env"
+            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "dist/.env"
+            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "dist/.env"
+            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "dist/.env"
+            
             npm i
             npm run build
             ls
