@@ -284,7 +284,8 @@ jobs:
             npm run build
             ls
             cd dist
-            cp ../package.json .
+            ls
+            cp ../package.json . ../main.ts
             zip -rq dist.zip *
             mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
             mv dist.zip ~/project/.circleci/ansible/roles/deploy/files/
