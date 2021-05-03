@@ -291,6 +291,7 @@ jobs:
           command: |
             apk add --update curl nodejs npm
             apk add --update ansible zip
+            apk add --update openssh-client tar gzip
             pip install awscli
 
       - run:
@@ -301,26 +302,35 @@ jobs:
             npm run build
             ls
             pwd
-            echo ENVIRONMENT=production > "dist/.env"
-            echo TYPEORM_CONNECTION=postgres >> "dist/.env"
-            echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "dist/.env"
-            echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> "dist/.env"
-            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "dist/.env"
-            echo NODE_ENV=production >> "dist/.env"
-            echo TYPEORM_HOST=$TYPEORM_HOST >> "dist/.env"
-            echo TYPEORM_PORT=$TYPEORM_PORT >> "dist/.env"
-            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "dist/.env"
-            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "dist/.env"
-            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "dist/.env"
+            echo ENVIRONMENT=production > ".env"
+            echo TYPEORM_CONNECTION=postgres >> ".env"
+            echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> ".env"
+            echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> ".env"
+            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> ".env"
+            echo NODE_ENV=production >> ".env"
+            echo TYPEORM_HOST=$TYPEORM_HOST >> ".env"
+            echo TYPEORM_PORT=$TYPEORM_PORT >> ".env"
+            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> ".env"
+            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> ".env"
+            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> ".env"
             
-            cat dist/.env
-            mv dist/.env dist/
-            cd dist
+            # cat .env
+            # # mv dist/.env dist/
+            # cd dist
             ls
-            cp ../package.json . 
-            zip -rq dist.zip *
-            mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
-            mv dist.zip ~/project/.circleci/ansible/roles/deploy/files/
+            # cp ../package.json . 
+            # zip -rq dist.zip *
+            # mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
+            # mv dist.zip ~/project/.circleci/ansible/roles/deploy/files/
+
+            cd /home
+            ls
+            tar czf backend.tar.gz -P /home/circleci/project/backend
+      # - run:
+      #     name: Deploy backend
+      #     command: |
+      #       cd /home
+      #       tar czf backend.tar.gz -P /home/circleci/project/backend/dist
       - run:
           name: Deploy backend Setup EC2 instance & copy compiled backend to the EC2 instance
           command: |
