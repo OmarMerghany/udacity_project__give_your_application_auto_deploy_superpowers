@@ -199,6 +199,10 @@ jobs:
           when: on_fail
           command: |
             apk add --update py3-pip && pip3 install --upgrade pip && pip3 install awscli
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/backend
       - destroy-environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID}"      
 
@@ -298,32 +302,35 @@ jobs:
           name: Build backend app
           command: |
             cd ~/project/backend
-            npm i
-            npm run build
-            ls
-            pwd
-            echo ENVIRONMENT=production > ".env"
-            echo TYPEORM_CONNECTION=postgres >> ".env"
-            echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> ".env"
-            echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> ".env"
-            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> ".env"
-            echo NODE_ENV=production >> ".env"
-            echo TYPEORM_HOST=$TYPEORM_HOST >> ".env"
-            echo TYPEORM_PORT=$TYPEORM_PORT >> ".env"
-            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> ".env"
-            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> ".env"
-            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> ".env"
+            # npm i
+            # npm run build
+            # ls
+            # pwd
+            # echo ENVIRONMENT=production > ".env"
+            # echo TYPEORM_CONNECTION=postgres >> ".env"
+            # echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> ".env"
+            # echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> ".env"
+            # echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> ".env"
+            # echo NODE_ENV=production >> ".env"
+            # echo TYPEORM_HOST=$TYPEORM_HOST >> ".env"
+            # echo TYPEORM_PORT=$TYPEORM_PORT >> ".env"
+            # echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> ".env"
+            # echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> ".env"
+            # echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> ".env"
             
             # cat .env
             # # mv dist/.env dist/
             # cd dist
-            ls
+            la
             # cp ../package.json . 
             # zip -rq dist.zip *
             # mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
             # mv dist.zip ~/project/.circleci/ansible/roles/deploy/files/
 
-            tar -czvf backend.tar.gz .
+            cd ../
+            cd backend/ && tar -zcvf ../backend.tar.gz . && cd - 
+
+            # tar -czvf backend.tar.gz .
             mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
             mv backend.tar.gz ~/project/.circleci/ansible/roles/deploy/files/
             # tar czf backend.tar.gz -P /home/circleci/project/backend
@@ -466,7 +473,7 @@ workflows:
       - run-migrations:
           requires: [configure-infrastructure]
       - deploy-frontend:
-          requires: [run-migrations]
+          requires: [run-migrations, deploy-backend]
       - deploy-backend:
           requires: [run-migrations]
       - smoke-test:
