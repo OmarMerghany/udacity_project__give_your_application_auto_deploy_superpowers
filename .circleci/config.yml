@@ -321,7 +321,7 @@ jobs:
             # cat .env
             # # mv dist/.env dist/
             # cd dist
-            la
+            ls
             # cp ../package.json . 
             # zip -rq dist.zip *
             # mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
