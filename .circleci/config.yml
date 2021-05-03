@@ -314,7 +314,7 @@ jobs:
             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "dist/.env"
             
             cat dist/.env
-            # mv .env dist/
+            mv dist/.env dist/
             cd dist
             ls
             cp ../package.json . 
