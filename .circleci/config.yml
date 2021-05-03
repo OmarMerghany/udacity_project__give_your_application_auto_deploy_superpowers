@@ -334,7 +334,7 @@ jobs:
       - run:
           name: Deploy backend Setup EC2 instance & copy compiled backend to the EC2 instance
           command: |
-            ls ~/project/.circleci/ansible/roles/deploy/files/
+            # ls ~/project/.circleci/ansible/roles/deploy/files/
             cd ~/project/backend
             ansible-galaxy install weareinteractive.environment
             cat ~/project/.circleci/ansible/inventory.txt
