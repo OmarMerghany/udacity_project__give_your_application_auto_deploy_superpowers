@@ -369,23 +369,23 @@ jobs:
 
   cloudfront-update:
     docker:
-      - image: python:3.7-alpine3.11
+      - image: amazon/aws-cli # python:3.7-alpine3.11
     steps:
       - checkout
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Install AWS CLI for rollback
-          command: |
-            apk add --update py3-pip && pip3 install --upgrade pip && pip3 install awscli
-            apk add --update curl nodejs npm
-            apk add --update ansible zip
-            apk add --update openssh-client tar gzip
+      # - attach_workspace:
+      #     at: ~/
+      # - run:
+      #     name: Install AWS CLI for rollback
+      #     command: |
+      #       apk add --update py3-pip && pip3 install --upgrade pip && pip3 install awscli
+      #       apk add --update curl nodejs npm
+      #       apk add --update ansible zip
+      #       apk add --update openssh-client tar gzip
 
       # - run:
       #     name: Install dependencies
       #     command: |
-      # - run: yum -y install tar gzip
+      - run: yum -y install tar gzip
       - run:
           name: Update cloudfront distribution
           command: |
