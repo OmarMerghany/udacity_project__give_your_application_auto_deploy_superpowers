@@ -7,43 +7,32 @@ In this project, you will prove your mastery of the following learning objective
 - Utilize a configuration management tool to accomplish deployment to cloud-based servers.
 - Surface critical server errors for diagnosis using centralized structured logging.
 
-![Diagram of CI/CD Pipeline we will be building.](udapeople.png)
-
-### Instructions
-
-* [Selling CI/CD](instructions/0-selling-cicd.md)
-* [Getting Started](instructions/1-getting-started.md)
-* [Deploying Working, Trustworthy Software](instructions/2-deploying-trustworthy-code.md)
-* [Configuration Management](instructions/3-configuration-management.md)
-* [Turn Errors into Sirens](instructions/4-turn-errors-into-sirens.md)
 
 ### Project Submission
 
-For your submission, please submit the following:
+Submission:
 
 - A text file named `urls.txt` including:
-  1. Public Url to GitHub repository (not private) [URL01]
-  1. Public URL for your S3 Bucket (aka, your green candidate front-end) [URL02]
-  1. Public URL for your CloudFront distribution (aka, your blue production front-end) [URL03]
-  1. Public URLs to deployed application back-end in EC2 [URL04]
-  1. Public URL to your Prometheus Server [URL05]
-- Your screenshots in JPG or PNG format, named using the screenshot number listed in the instructions. These screenshots should be included in your code repository in the root folder.
-  1. Job failed because of compile errors. [SCREENSHOT01]
-  1. Job failed because of unit tests. [SCREENSHOT02]
-  1. Job that failed because of vulnerable packages. [SCREENSHOT03]
-  1. An alert from one of your failed builds. [SCREENSHOT04]
-  1. Appropriate job failure for infrastructure creation. [SCREENSHOT05]
-  1. Appropriate job failure for the smoke test job. [SCREENSHOT06]
-  1. Successful rollback after a failed smoke test. [SCREENSHOT07]  
-  1. Successful promotion job. [SCREENSHOT08]
-  1. Successful cleanup job. [SCREENSHOT09]
-  1. Only deploy on pushed to `master` branch. [SCREENSHOT10]
-  1. Provide a screenshot of a graph of your EC2 instance including available memory, available disk space, and CPU usage. [SCREENSHOT11]
-  1. Provide a screenshot of an alert that was sent by Prometheus. [SCREENSHOT12]
+  1. Public Url to GitHub repository (not private) [https://github.com/OmarMerghany/udacity_project__give_your_application_auto_deploy_superpowers]
+  1. Public URL for S3 Bucket (aka, green candidate front-end) [https://udapeople-prod-8d416ce7-d0f4-455e-ae2a-3579f2f0f8fc.s3-us-west-2.amazonaws.com/index.html#/employees]
+  1. Public URL for CloudFront distribution (aka, blue production front-end) [https://d2kuk4xcvuooy6.cloudfront.net/]
+  1. Public URLs to deployed application back-end in EC2 [http://ec2-34-213-50-237.us-west-2.compute.amazonaws.com:3030/]
+  1. Public URL to Prometheus Server [http://34.221.181.186:9090/graph]
+- These screenshots is included in the code repository in the root folder.
+  1. Job failed because of compile errors. [SCREENSHOT01.PNG]
+  1. Job failed because of unit tests. [SCREENSHOT02.PNG]
+  1. Job that failed because of vulnerable packages. [SCREENSHOT03.PNG]
+  1. An alert from one of failed builds. [SCREENSHOT04.PNG]
+  1. Appropriate job failure for infrastructure creation. [SCREENSHOT05.PNG]
+  1. Appropriate job failure for the smoke test job. [SCREENSHOT06.PNG]
+  1. Successful rollback after a failed smoke test. [SCREENSHOT07.PNG]  
+  1. Successful promotion job. [SCREENSHOT08.PNG]
+  1. Successful cleanup job. [SCREENSHOT09.PNG]
+  1. Only deploy on pushed to `master` branch. [SCREENSHOT10.PNG]
+  1. Provide a screenshot of a graph of your EC2 instance including available memory, available disk space, and CPU usage. [SCREENSHOT11.PNG]
+  1. Provide a screenshot of an alert that was sent by Prometheus. [SCREENSHOT12.PNG]
 
-- Your presentation should be in PDF format named "presentation.pdf" and should be included in your code repository root folder. 
-
-Before you submit your project, please check your work against the project rubric. If you haven’t satisfied each criterion in the rubric, then revise your work so that you have met all the requirements. 
+- Presentation is in PDF format named "presentation.pdf" and is included in the code repository root folder. 
 
 ### Built With
 
