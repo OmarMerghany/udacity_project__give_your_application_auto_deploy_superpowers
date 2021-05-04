@@ -386,7 +386,7 @@ jobs:
       - run:
           name: Frontend smoke test.
           command: |
-            if curl -s http://udapeople-prod-${CIRCLE_WORKFLOW_ID:0:7}.s3-website.us-west-2.amazonaws.com/ | grep "Welcome"
+            if curl -s http://udapeople-prod-${CIRCLE_WORKFLOW_ID}.s3-website.us-west-2.amazonaws.com/ | grep "Welcome"
             then
             return 0
             else
@@ -397,39 +397,43 @@ jobs:
       - revert-migrations  
 
 
-  # cloudfront-update:
-  #   docker:
-  #     - image: amazon/aws-cli
-  #   steps:
-  #     - checkout
-  #     - attach_workspace:
-  #         at: ~/
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           # your code here
-  #     - run:
-  #         name: Update cloudfront distribution
-  #         command: |
-  #           OLD_WORKFLOW_ID=$(aws cloudformation \
-  #             list-exports --query "Exports[?Name==\`UdapeopleWorkflowID\`].Value" \
-  #             --no-paginate --output text)
-  #           echo "OLD_WORKFLOW_ID: $OLD_WORKFLOW_ID."
-  #           export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
-  #             --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
-  #           printf '%s\n' "${STACKS[@]}"
-  #           aws cloudformation deploy \
-  #             --template-file .circleci/files/cloudfront.yml \
-  #             --parameter-overrides workflow_id="prod-${CIRCLE_WORKFLOW_ID}" \
-  #             --stack-name udapeople-prod-cloudfront
-  #           if printf '%s\n' "${STACKS[@]}" | grep -q "$OLD_WORKFLOW_ID"; then
-  #             echo "Removing previous stack"
-  #             aws s3 rm "s3://udapeople-${OLD_WORKFLOW_ID}" --recursive
-  #             aws cloudformation delete-stack --stack-name "udapeople-backend-${OLD_WORKFLOW_ID}"
-  #             aws cloudformation delete-stack --stack-name "udapeople-frontend-${OLD_WORKFLOW_ID}"
-  #           fi
+  cloudfront-update:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/
+      # - run:
+      #     name: Install dependencies
+      #     command: |
+      #       # your code here
+      - run:
+          name: Update cloudfront distribution
+          command: |
+            OLD_WORKFLOW_ID=$(aws cloudformation \
+              list-exports --query "Exports[?Name==\`UdapeopleWorkflowID\`].Value" \
+              --no-paginate --output text)
+            echo "OLD_WORKFLOW_ID: $OLD_WORKFLOW_ID."
+            export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
+              --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
+            printf '%s\n' "${STACKS[@]}"
 
-      # Here's where you will add some code to rollback on failure  
+            aws cloudformation deploy \
+              --template-file .circleci/files/cloudfront.yml \
+              --parameter-overrides workflow_id="prod-${CIRCLE_WORKFLOW_ID}" \
+              --stack-name udapeople-prod-cloudfront
+
+            if printf '%s\n' "${STACKS[@]}" | grep -q "$OLD_WORKFLOW_ID"; then
+              echo "Removing previous stack"
+              aws s3 rm "s3://udapeople-${OLD_WORKFLOW_ID}" --recursive
+              aws cloudformation delete-stack --stack-name "udapeople-backend-${OLD_WORKFLOW_ID}"
+              aws cloudformation delete-stack --stack-name "udapeople-frontend-${OLD_WORKFLOW_ID}"
+            fi
+
+      - destroy-environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID}"
+      - revert-migrations    
 
 # cleanup:
 #     docker:
