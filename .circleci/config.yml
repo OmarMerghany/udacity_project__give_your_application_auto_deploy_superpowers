@@ -369,15 +369,23 @@ jobs:
 
   cloudfront-update:
     docker:
-      - image: amazon/aws-cli
+      - image: python:3.7-alpine3.11
     steps:
       - checkout
       - attach_workspace:
           at: ~/
+      - run:
+          name: Install AWS CLI for rollback
+          command: |
+            apk add --update py3-pip && pip3 install --upgrade pip && pip3 install awscli
+            apk add --update curl nodejs npm
+            apk add --update ansible zip
+            apk add --update openssh-client tar gzip
+
       # - run:
       #     name: Install dependencies
       #     command: |
-      - run: yum -y install tar gzip
+      # - run: yum -y install tar gzip
       - run:
           name: Update cloudfront distribution
           command: |
@@ -400,7 +408,7 @@ jobs:
               aws cloudformation delete-stack --stack-name "udapeople-backend-${OLD_WORKFLOW_ID}"
               aws cloudformation delete-stack --stack-name "udapeople-frontend-${OLD_WORKFLOW_ID}"
             fi
-
+      
       - destroy-environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID}"
       - revert-migrations    
