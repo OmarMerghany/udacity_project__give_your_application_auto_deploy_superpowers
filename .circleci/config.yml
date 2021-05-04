@@ -430,21 +430,47 @@ jobs:
                 aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
                 aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
               fi
-    # steps:
-    #   # Checkout code from git
-    #   - run:
-    #       name: Get old stack workflow id
-    #       command: |
-    #         # your code here
-    #         export OldWorkflowID="the id here"
-    #         export STACKS=[] #put the list of stacks here
-    #   - run:
-    #       name: Remove old stacks and files
-    #       command: |
-    #         if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
-    #         then
-    #           # your code here
-    #         fi
+  
+  prometheus-node-exporter:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [backend-build]
+      - add_ssh_keys:
+          fingerprints: ["29:46:04:9c:65:1e:1c:d1:0e:8a:65:0a:c1:7c:f1:11"]
+      - attach_workspace:
+          at: ~/
+      - run: 
+          name: Install dependencies
+          command: |
+            apk add --update curl nodejs npm
+            apk add --update ansible zip
+            apk add --update openssh-client tar gzip
+            pip install awscli
+
+      # - run:
+      #     name: Build backend app
+      #     command: |
+      #       cd ~/project/backend
+      #       ls
+      #       cd ../
+      #       cd backend/ && tar -zcvf ../backend.tar.gz . && cd - 
+
+      #       mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
+      #       mv backend.tar.gz ~/project/.circleci/ansible/roles/deploy/files/
+
+      - run:
+          name: Deploy backend Setup EC2 instance & copy compiled backend to the EC2 instance
+          command: |
+            cd ~/project/backend
+            ansible-galaxy install weareinteractive.environment
+            cat ~/project/.circleci/ansible/inventory.txt
+            ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/configure_node_exporter.yml
+      # - destroy-environment:
+      #     workflow_id: "${CIRCLE_WORKFLOW_ID}"
+      # - revert-migrations 
             
 workflows:
   default:
@@ -460,10 +486,10 @@ workflows:
       - scan-frontend:
           requires: [build-frontend]
       - deploy-infrastructure:
-          requires: [build-frontend, build-backend] #[test-frontend, test-backend, scan-frontend, scan-backend]
+          requires: [test-frontend, test-backend, scan-frontend, scan-backend] # [build-frontend, build-backend]
           filters:
             branches:
-              only: [test-feature-branch]
+              only: [master]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
       - run-migrations:
@@ -476,5 +502,7 @@ workflows:
           requires: [deploy-backend, deploy-frontend]
       - cloudfront-update:
           requires: [smoke-test]
-      - cleanup:
+      - prometheus-node-exporter:
           requires: [cloudfront-update]
+      # - cleanup:
+      #     requires: [cloudfront-update]
