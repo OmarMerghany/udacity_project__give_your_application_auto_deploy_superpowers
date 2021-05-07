@@ -1,5 +1,0 @@
-https://github.com/OmarMerghany/udacity_project__give_your_application_auto_deploy_superpowers
-https://udapeople-prod-8d416ce7-d0f4-455e-ae2a-3579f2f0f8fc.s3-us-west-2.amazonaws.com/index.html#/employees
-https://d2kuk4xcvuooy6.cloudfront.net/
-http://ec2-34-213-50-237.us-west-2.compute.amazonaws.com:3030/
-http://34.221.181.186:9090/graph

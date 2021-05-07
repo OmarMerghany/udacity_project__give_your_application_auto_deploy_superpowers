@@ -1,5 +1,6 @@
 ## Give your Application Auto-Deploy Superpowers
 [![CircleCI](https://circleci.com/gh/OmarMerghany/udacity_project__give_your_application_auto_deploy_superpowers.svg?style=svg)](https://circleci.com/gh/OmarMerghany/udacity_project__give_your_application_auto_deploy_superpowers)
+
 Project objectives:
 
 - Explain the fundamentals and benefits of CI/CD to achieve, build, and deploy automation for cloud-based software products.
